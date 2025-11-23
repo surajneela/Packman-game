@@ -1,29 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pacman</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-    <div class="game-container">
-        <div class="score-container">
-            <div class="score">Score: <span id="score">0</span></div>
-            <div class="lives">Lives: <span id="lives">3</span></div>
-        </div>
-        <canvas id="gameCanvas"></canvas>
-        <div id="menu" class="menu hidden">
-            <div class="menu-content">
-                <h2>Pacman</h2>
-                <button id="newGameBtn">New Game</button>
-                <button id="continueBtn">Continue</button>
-            </div>
-        </div>
-    </div>
-    <script src="game.js"></script>
-</body>
-
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pacman-react</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

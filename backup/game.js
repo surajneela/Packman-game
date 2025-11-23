@@ -9,7 +9,7 @@ const GHOST_SPEED = 1.5;
 let canvas, ctx;
 let pacman = {
     x: 14 * CELL_SIZE,
-    y: 23 * CELL_SIZE,
+    y: 17 * CELL_SIZE,
     direction: 0, // 0: right, 1: down, 2: left, 3: up
     mouthOpen: 0,
     mouthSpeed: 0.15,
@@ -24,7 +24,7 @@ let gameState = {
     score: 0,
     lives: 3,
     dots: [],
-    pacman: { x: 14 * CELL_SIZE, y: 23 * CELL_SIZE, direction: 0 },
+    pacman: { x: 14 * CELL_SIZE, y: 17 * CELL_SIZE, direction: 0 },
     ghosts: [],
 };
 
@@ -149,14 +149,59 @@ function initGhosts() {
 
 // Check if position is a wall
 function isWall(x, y) {
-    // Simple wall layout - you can make this more complex
-    return (
-        x === 0 ||
-        x === GRID_WIDTH - 1 ||
-        y === 0 ||
-        y === GRID_HEIGHT - 1 ||
-        (x > 10 && x < 17 && y > 10 && y < 15)
-    );
+    // Outer walls
+    if (x === 0 || x === GRID_WIDTH - 1 || y === 0 || y === GRID_HEIGHT - 1) {
+        return true;
+    }
+
+    // Ghost house (center)
+    if (x > 10 && x < 17 && y > 10 && y < 15) {
+        return true;
+    }
+
+    // S (Hollow-ish)
+    // Top part (Left vertical, open right)
+    if (y === 3 && x >= 2 && x <= 5) return true; // Top
+    if (x === 2 && y >= 3 && y <= 6) return true; // Left Top
+    if (y === 6 && x >= 2 && x <= 5) return true; // Mid
+
+    // Bottom part (Right vertical, open left)
+    if (x === 5 && y >= 6 && y <= 9) return true; // Right Bottom
+    if (y === 9 && x >= 2 && x <= 5) return true; // Bottom
+
+    // U (Hollow cup)
+    if (x === 7 && y >= 3 && y <= 9) return true;
+    if (x === 10 && y >= 3 && y <= 9) return true;
+    if (y === 9 && x >= 7 && x <= 10) return true;
+
+    // R (Hollow loop with leg)
+    if (x === 12 && y >= 3 && y <= 9) return true; // Left spine
+    if (y === 3 && x >= 12 && x <= 15) return true; // Top
+    if (x === 15 && y >= 3 && y <= 6) return true; // Right loop
+    if (y === 6 && x >= 14 && x <= 15) return true; // Mid (gap at 13)
+    if (x === 15 && y >= 6 && y <= 9) return true; // Leg
+
+    // A (Hollow arch)
+    if (x === 17 && y >= 3 && y <= 9) return true; // Left leg
+    if (x === 20 && y >= 3 && y <= 9) return true; // Right leg
+    if (y === 3 && x >= 17 && x <= 20) return true; // Top
+    if (y === 6 && x >= 19 && x <= 20) return true; // Crossbar (gap at 18)
+    if (y === 6 && x === 17) return true; // Crossbar left bit
+
+    // J (Hollow hook)
+    if (x === 24 && y >= 3 && y <= 9) return true; // Right spine
+    if (y === 9 && x >= 22 && x <= 24) return true; // Bottom
+    if (x === 22 && y >= 7 && y <= 9) return true; // Hook tip
+
+    // Bottom filler to keep game interesting
+    if (y === 20 && x >= 4 && x <= 23) return true;
+    if (x === 13 && y >= 20 && y <= 25) return true;
+    if (x === 14 && y >= 20 && y <= 25) return true;
+
+    if (y === 25 && x >= 2 && x <= 8) return true;
+    if (y === 25 && x >= 19 && x <= 25) return true;
+
+    return false;
 }
 
 // Handle keyboard input
@@ -318,7 +363,7 @@ function checkCollisions() {
 // Reset positions after collision
 function resetPositions() {
     pacman.x = 14 * CELL_SIZE;
-    pacman.y = 23 * CELL_SIZE;
+    pacman.y = 17 * CELL_SIZE;
     initGhosts();
 }
 
