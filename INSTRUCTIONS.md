@@ -11,8 +11,6 @@ git clone <https://github.com/surajneela/Packman-game>
 cd Packman
 ```
 
-*(Replace `<https://github.com/surajneela/Packman-game>` with the actual URL of this repository)*
-
 ---
 
 ## 2. Python Version
