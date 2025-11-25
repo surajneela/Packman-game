@@ -7,11 +7,11 @@ This guide provides instructions on how to clone the repository and run both the
 To get started, clone the repository to your local machine using Git:
 
 ```bash
-git clone <repository-url>
+git clone <https://github.com/surajneela/Packman-game>
 cd Packman
 ```
 
-*(Replace `<repository-url>` with the actual URL of this repository)*
+*(Replace `<https://github.com/surajneela/Packman-game>` with the actual URL of this repository)*
 
 ---
 
