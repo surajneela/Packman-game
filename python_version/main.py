@@ -23,14 +23,14 @@ PINK = (255, 182, 193)
 CYAN = (0, 255, 255)
 ORANGE = (255, 165, 0)
 
-def is_wall(x, y):
+def is_wall(x, y, is_ghost=False):
     # Outer walls
     if x == 0 or x == GRID_WIDTH - 1 or y == 0 or y == GRID_HEIGHT - 1:
         return True
 
     # Ghost house (center)
     if 10 < x < 17 and 10 < y < 15:
-        return True
+        return not is_ghost
 
     # S (Hollow-ish)
     # Top part (Left vertical, open right)
@@ -190,10 +190,10 @@ class Ghost:
     
     def check_collision(self, x, y):
         # Same collision logic as Pacman
-        if is_wall(int(x // CELL_SIZE), int(y // CELL_SIZE)): return True
-        if is_wall(int((x + CELL_SIZE - 1) // CELL_SIZE), int(y // CELL_SIZE)): return True
-        if is_wall(int(x // CELL_SIZE), int((y + CELL_SIZE - 1) // CELL_SIZE)): return True
-        if is_wall(int((x + CELL_SIZE - 1) // CELL_SIZE), int((y + CELL_SIZE - 1) // CELL_SIZE)): return True
+        if is_wall(int(x // CELL_SIZE), int(y // CELL_SIZE), is_ghost=True): return True
+        if is_wall(int((x + CELL_SIZE - 1) // CELL_SIZE), int(y // CELL_SIZE), is_ghost=True): return True
+        if is_wall(int(x // CELL_SIZE), int((y + CELL_SIZE - 1) // CELL_SIZE), is_ghost=True): return True
+        if is_wall(int((x + CELL_SIZE - 1) // CELL_SIZE), int((y + CELL_SIZE - 1) // CELL_SIZE), is_ghost=True): return True
         return False
     
     def update(self):
@@ -223,201 +223,6 @@ class Ghost:
     def draw(self, screen):
         # Draw ghost body (circle top, rect bottom)
         x = int(self.x)
-        y = int(self.y)
-        
-        pygame.draw.circle(screen, self.color, (x + CELL_SIZE // 2, y + CELL_SIZE // 2), CELL_SIZE // 2)
-        pygame.draw.rect(screen, self.color, (x, y + CELL_SIZE // 2, CELL_SIZE, CELL_SIZE // 2))
-
-class Game:
-    def __init__(self):
-        pygame.init()
-        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT + SCORE_HEIGHT))
-        pygame.display.set_caption("Pacman")
-        self.clock = pygame.time.Clock()
-        self.font = pygame.font.SysFont('Arial', 24)
-        self.menu_font = pygame.font.SysFont('Arial', 48)
-        self.button_font = pygame.font.SysFont('Arial', 32)
-        
-        self.reset_game()
-        self.is_menu_visible = True
-        self.is_game_running = False
-
-    def init_dots(self):
-        dots = []
-        for y in range(GRID_HEIGHT):
-            for x in range(GRID_WIDTH):
-                if not is_wall(x, y):
-                    dots.append({'x': x, 'y': y})
-        return dots
-
-    def init_ghosts(self):
-        return [
-            Ghost(13 * CELL_SIZE, 11 * CELL_SIZE, "red"),
-            Ghost(14 * CELL_SIZE, 11 * CELL_SIZE, "pink"),
-            Ghost(13 * CELL_SIZE, 12 * CELL_SIZE, "cyan"),
-            Ghost(14 * CELL_SIZE, 12 * CELL_SIZE, "orange"),
-        ]
-
-    def reset_game(self):
-        self.score = 0
-        self.lives = 3
-        self.dots = self.init_dots()
-        self.pacman = Pacman()
-        self.ghosts = self.init_ghosts()
-        self.reset_positions()
-
-    def reset_positions(self):
-        self.pacman.reset()
-        for ghost in self.ghosts:
-            ghost.reset()
-
-    def start_new_game(self):
-        self.is_menu_visible = False
-        self.reset_game()
-        self.is_game_running = True
-
-    def continue_game(self):
-        self.is_menu_visible = False
-        self.is_game_running = True
-
-    def game_over(self):
-        self.is_game_running = False
-        # In a real game we might show a message, here we just go back to menu
-        # But let's show "Game Over" briefly or just reset
-        print("Game Over!")
-        self.reset_game()
-        self.is_menu_visible = True
-
-    def handle_input(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            
-            if event.type == pygame.KEYDOWN:
-                if self.is_menu_visible:
-                    # Simple menu navigation with keys or just click
-                    pass
-                else:
-                    if event.key == pygame.K_ESCAPE:
-                        self.is_game_running = False
-                        self.is_menu_visible = True
-                    elif event.key == pygame.K_RIGHT: self.pacman.next_direction = 0
-                    elif event.key == pygame.K_DOWN: self.pacman.next_direction = 1
-                    elif event.key == pygame.K_LEFT: self.pacman.next_direction = 2
-                    elif event.key == pygame.K_UP: self.pacman.next_direction = 3
-
-            if event.type == pygame.MOUSEBUTTONDOWN and self.is_menu_visible:
-                mouse_pos = event.pos
-                # Check button clicks
-                # New Game Button
-                if self.new_game_rect.collidepoint(mouse_pos):
-                    self.start_new_game()
-                # Continue Button
-                elif self.continue_rect.collidepoint(mouse_pos):
-                    self.continue_game()
-
-    def update(self):
-        if not self.is_game_running:
-            return
-
-        self.pacman.update()
-        for ghost in self.ghosts:
-            ghost.update()
-
-        # Check collisions
-        # Dots
-        p_grid_x = int(self.pacman.x // CELL_SIZE)
-        p_grid_y = int(self.pacman.y // CELL_SIZE)
-        
-        # Filter dots
-        new_dots = []
-        for dot in self.dots:
-            if dot['x'] == p_grid_x and dot['y'] == p_grid_y:
-                self.score += 10
-            else:
-                new_dots.append(dot)
-        self.dots = new_dots
-
-        if len(self.dots) == 0:
-            print("You win!")
-            self.reset_game()
-            self.is_game_running = False
-            self.is_menu_visible = True
-            return
-
-        # Ghosts
-        for ghost in self.ghosts:
-            distance = math.sqrt((self.pacman.x - ghost.x)**2 + (self.pacman.y - ghost.y)**2)
-            if distance < CELL_SIZE:
-                self.lives -= 1
-                if self.lives <= 0:
-                    self.game_over()
-                else:
-                    self.reset_positions()
-
-    def draw(self):
-        self.screen.fill(BLACK)
-
-        # Draw Score Area
-        pygame.draw.rect(self.screen, BLACK, (0, 0, WINDOW_WIDTH, SCORE_HEIGHT))
-        score_text = self.font.render(f"Score: {self.score}", True, WHITE)
-        lives_text = self.font.render(f"Lives: {self.lives}", True, WHITE)
-        self.screen.blit(score_text, (20, 20))
-        self.screen.blit(lives_text, (WINDOW_WIDTH - 100, 20))
-
-        # Draw Game Area Offset
-        game_surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
-        game_surface.fill(BLACK)
-
-        # Draw Walls
-        for y in range(GRID_HEIGHT):
-            for x in range(GRID_WIDTH):
-                if is_wall(x, y):
-                    pygame.draw.rect(game_surface, BLUE, (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-
-        # Draw Dots
-        for dot in self.dots:
-            pygame.draw.circle(game_surface, WHITE, 
-                             (dot['x'] * CELL_SIZE + CELL_SIZE // 2, dot['y'] * CELL_SIZE + CELL_SIZE // 2), 
-                             2)
-
-        # Draw Entities
-        # We need to pass the surface to draw on, but our classes draw on 'screen'.
-        # Let's adjust the classes to accept a surface and offsets, or just translate the context.
-        # Actually, let's just draw directly on screen with offset.
-        
-        offset_y = SCORE_HEIGHT
-        self.screen.blit(game_surface, (0, offset_y))
-        
-        # We need to draw dynamic elements with offset
-        # Redefine draw methods to take offset? Or just move the surface blit after?
-        # If we draw pacman on game_surface, it will be easier.
-        
-        self.pacman.draw(game_surface)
-        for ghost in self.ghosts:
-            ghost.draw(game_surface)
-            
-        self.screen.blit(game_surface, (0, offset_y))
-
-        # Draw Menu
-        if self.is_menu_visible:
-            overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT + SCORE_HEIGHT), pygame.SRCALPHA)
-            overlay.fill((0, 0, 0, 230)) # Semi-transparent black
-            self.screen.blit(overlay, (0, 0))
-            
-            title_text = self.menu_font.render("Pacman", True, YELLOW)
-            title_rect = title_text.get_rect(center=(WINDOW_WIDTH // 2, 150))
-            self.screen.blit(title_text, title_rect)
-            
-            # Buttons
-            button_width = 200
-            button_height = 50
-            
-            self.new_game_rect = pygame.Rect((WINDOW_WIDTH - button_width) // 2, 250, button_width, button_height)
-            self.continue_rect = pygame.Rect((WINDOW_WIDTH - button_width) // 2, 320, button_width, button_height)
-            
-            pygame.draw.rect(self.screen, BLUE, self.new_game_rect, border_radius=5)
         y = int(self.y)
         
         pygame.draw.circle(screen, self.color, (x + CELL_SIZE // 2, y + CELL_SIZE // 2), CELL_SIZE // 2)
