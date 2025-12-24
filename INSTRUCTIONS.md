@@ -1,6 +1,6 @@
 # Project Setup and Execution Guide
 
-This guide provides instructions on how to clone the repository and run both the Python and JavaScript (React) versions of the Pacman game.
+This guide provides instructions on how to clone the repository and run both the Python and Java versions of the Pacman game.
 
 ## 1. Clone the Repository
 
@@ -44,37 +44,29 @@ The game window should open immediately.
 
 ---
 
-## 3. JavaScript (React) Version
+## 3. Java Version
 
-This is a web-based version of the game built with React and Vite. 
-*(Note: This corresponds to the web application source code found in the `src` directory).*
+This version is a standalone desktop application written in Java.
 
 ### Prerequisites
-- Node.js and npm (Node Package Manager) installed.
+- Java Development Kit (JDK) installed (at least Java 8).
 
 ### Steps to Run
 
-1.  **Navigate to the project root:**
-    If you are currently in the `python_version` directory, go back to the root:
+1.  **Navigate to the Java directory:**
     ```bash
-    cd ..
-    ```
-    Otherwise, ensure you are in the root `Packman` directory.
-
-2.  **Install Dependencies:**
-    Install the necessary Node.js packages:
-    ```bash
-    npm install
+    cd "Java version"
     ```
 
-3.  **Start the Development Server:**
-    Run the following command to start the local development server:
+2.  **Compile the Code:**
     ```bash
-    npm run dev
+    javac PacmanGame.java
     ```
 
-4.  **Open in Browser:**
-    The terminal will display a local URL (usually `http://localhost:5173/`). Open this URL in your web browser to play the game.
+3.  **Run the Game:**
+    ```bash
+    java PacmanGame
+    ```
 
 ---
 
@@ -84,6 +76,6 @@ This is a web-based version of the game built with React and Vite.
     - If you encounter a "module not found" error, ensure you have activated your virtual environment (if using one) and installed the requirements successfully.
     - If `python` command is not recognized, try using `python3` (on macOS/Linux) or check your system PATH variables.
 
-- **JavaScript Version:**
-    - If `npm install` fails, ensure you have a recent version of Node.js installed.
-    - If the port 5173 is already in use, Vite will automatically try the next available port. Check the terminal output for the correct URL.
+- **Java Version:**
+    - Ensure `javac` and `java` commands are in your system PATH.
+
